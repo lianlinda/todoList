@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" ng-app="taskApp">
+<head>
+	<meta charset="UTF-8">
+	<title>todoList</title>
+	<link rel="stylesheet" href="https://cdn.static.runoob.com/libs/bootstrap/3.3.7/css/bootstrap.min.css">  
+	<link rel="stylesheet" href="task.css">
+</head>
+<body>
+	<div id="container" ng-controller="taskCtrl">
+		<h1>任务列表</h1>
+		<!--<form class="form-horizontal" role="form" ng-submit="addTask()">
+			<div class="form-group">
+				<label for="newTaskName" class="col-sm-3 control-label">任务名称:</label>
+				<div class="col-sm-8">
+					<input type="text" class="form-control" id="newTaskName" placeholder="任务名称" ng-model="newTaskName" required>
+				</div>
+			</div>
+			<div class="form-group">
+				<label for="newTaskContent" class="col-sm-3 control-label">任务内容:</label>
+				<div class="col-sm-8">
+					<input type="text" class="form-control" id="newTaskContent" placeholder="任务内容" ng-model="newTaskContent">
+				</div>
+			</div>
+		</form>-->
+		<form role="form" name="addTaskForm">
+			<div class="form-group">
+				<input type="text" class="form-control form-control-inline" name="taskName" placeholder="添加新任务" ng-model="newTask" ng-required="true" ng-maxLength="20" ng-change="checkTaskName()">
+				<button type="submit" class="btn btn-primary" ng-click="addTask()" ng-disabled="addTaskForm.$invalid">添加</button>
+				<div class="alert alert-danger alert-margin" role="alert" ng-show="showError">
+					任务必填，且最多为20个字符
+				</div>
+			</div>
+		</form>
+		<div><input type="checkbox" ng-model="finishAll" id="finishAll" ng-click="finishAllTask()" ng-disabled="disabled=!hasTask()"><label for="finishAll" class="finishAll-{{disabled}}" ng-class="{'finishAll-true': exp,'finishAll-false': !exp">标记全部为已完成</label></div>
+		<div class="btn-group">
+			<button type="button" class="btn btn-default" ng-click="finished=''">全部<span class="badge" ng-bind="countAll()"></span></button>
+			<button type="button" class="btn btn-default" ng-click="finished='false'">未完成<span class="badge" ng-bind="countUnfinished()"></span></button>
+			<button type="button" class="btn btn-default" ng-click="finished='true'">已完成<span class="badge" ng-bind="countFinished()"></span></button>
+		</div>
+		<button type="button" class="btn btn-default" data-toggle="modal" data-target="#removeAllTasks" ng-disabled="!hasTask()">删除所有任务<span class="glyphicon glyphicon-remove"></span></button>
+		<ul id="taskList" class="list-group">
+			<li class="list-group-item select-{{point}}" ng-repeat="task in allTasks | filter:finished" ng-init="point=false" ng-mouseover="point=true" ng-mouseleave="point=false">
+				<label><input type="checkbox" ng-model="task.isFinished" ng-click="isAllFinished()"></label>
+				<span class="task-{{task.isFinished}}">{{task.taskName}}</span>
+				<span class="glyphicon glyphicon-remove fr icon-{{point}}" data-toggle="modal" data-target="#removeTask" ng-click="isRemoveTask($index)"></span>
+				<span class="glyphicon glyphicon-pencil fr icon-{{point}}" data-toggle="modal" data-target="#editTask" ng-click="editTask($index)"></span>
+				<span class="task-{{task.isFinished}} fr">{{task.taskTime | date:'yyyy-MM-dd HH:mm:ss'}}</span>
+			</li>
+		</ul>
+		<div class="modal fade" id="removeTask"tabindex="-1" role="dialog"  aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<!--<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+							&times;
+						</button>
+						<h4 class="modal-title" id="myModalLabel">
+							模态框（Modal）标题
+						</h4>
+					</div>-->
+					<div class="modal-body">
+						是否删除任务:{{tempTask.taskName}}？
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" ng-click="removeTask()" data-dismiss="modal">确定</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="removeAllTasks"tabindex="-1" role="dialog"  aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<!--<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+							&times;
+						</button>
+						<h4 class="modal-title" id="myModalLabel">
+							模态框（Modal）标题
+						</h4>
+					</div>-->
+					<div class="modal-body">
+						是否删除所有任务？
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" ng-click="removeAllTasks()" data-dismiss="modal">确定</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+					</div>
+				</div>
+			</div>
+		</div>
+		<div class="modal fade" id="editTask"tabindex="-1" role="dialog"  aria-hidden="true">
+			<div class="modal-dialog">
+				<div class="modal-content">
+					<div class="modal-header">
+						<button type="button" class="close" data-dismiss="modal" aria-hidden="true">
+							&times;
+						</button>
+						<h4 class="modal-title" id="myModalLabel">
+							编辑任务
+						</h4>
+					</div>
+					<div class="modal-body">
+						<div class="form-group">
+							<input type="text" class="form-control" name="" placeholder="任务名称" ng-model="tempTask.taskName" value="{{tempTask.taskName}}">
+						</div>
+					</div>
+					<div class="modal-footer">
+						<button type="button" class="btn btn-primary" ng-click="updateTask()" data-dismiss="modal">确定</button>
+						<button type="button" class="btn btn-default" data-dismiss="modal">取消</button>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+	<script src="https://cdn.static.runoob.com/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="https://cdn.static.runoob.com/libs/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+	<script src="http://cdn.static.runoob.com/libs/angular.js/1.4.6/angular.min.js"></script>
+	<script src="task.js"></script>
+</body>
+</html>

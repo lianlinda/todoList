@@ -1,0 +1,38 @@
+#container{
+    width: 400px;
+    margin: 0 auto;
+}
+.task-true{
+    text-decoration:line-through;
+    color: #AAA;
+    word-wrap:break-word;
+}
+.fr{
+    float: right;
+}
+#taskList{
+    margin-top: 10px;
+}
+.icon-true{
+    visibility: visible;
+    cursor: pointer;
+    margin-left: 5px;
+}
+.icon-false{
+    visibility: hidden;
+    margin-left: 5px;
+}
+.select-true{
+    /*background-color: lightskyblue;*/
+}
+.finishAll-true{
+    text-decoration:line-through;
+    color: #AAA;
+}
+.form-control-inline{
+    display: inline;
+    width: 85%;
+}
+.alert-margin{
+    margin-top: 10px;
+}
